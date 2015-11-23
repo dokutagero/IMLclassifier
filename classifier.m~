@@ -36,42 +36,17 @@ end
 % examples of class +1, and the same for the other class.
 
 d2 = diabetes_db.x;
-idx_c1=0;
-idx_c2=0;
-% meanc1 contains the mean of each column without considering the NaN value
-% for instances belonging to class +1.
-% meanc2 contains the mean of each column without considering the NaN value
-% for instances belonging to class -1;
-meanc1 = zeros(size(diabetes_db.x,1),1);
-meanc2 = zeros(size(diabetes_db.x,1),1);
-for i=1:size(diabetes_db.x,1)
 
-    for j=1:size(diabetes_db.x,2)
-        if ~isnan(diabetes_db.x(i,j))
-            if diabetes_db.y(i) == 1
-                meanc1(i) = meanc1(i) + diabetes_db.x(i,j);
-                idx_c1 = idx_c1 + 1;
-            else
-                meanc2(i) = meanc2(i) + diabetes_db.x(i,j);
-                idx_c2 = idx_c2 + 1;
-            end
-        end
-    end
-    meanc1(i) = meanc1(i) / idx_c1;
-    meanc2(i) = meanc2(i) / idx_c2;
+for i=1:size(diabetes_db.x,1)
+    attr = diabetes_db.x(i,:);
+    attr_no_nan = ~isnan(diabetes_db.x(i,:));
+    % c is a vector containing 1 or -1 in those positions that correspond
+    % to the ith instance of data, describing its belonging to class 1 or
+    % -1. On the other hand, a 0 corresponds to a NaN element.
+    c = diabetes_db.y .* attr_no_nan';
+    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
+    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
+    diabetes_db.x() = 
 end
 
-%meanc1_total = mean(meanc1);
-%meanc2_total = mean(meanc2);
-
-% Substitute each NaN value with the corresponding mean for each class.
-% for i=1:size(diabetes_db.x,2)
-%     nan_pos = isnan(diabetes_db.x(:,i));
-%     nan_pos_inv = ~nan_pos;
-%     if diabetes_db.y(i)==1
-%         d2(nan_pos,i) = meanc1_total;
-%     else
-%         d2(nan_pos,i) = meanc2_total;
-%     end
-% end
 
