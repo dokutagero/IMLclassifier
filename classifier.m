@@ -53,4 +53,9 @@ for i=1:size(diabetes_db.x,1)
     d2(i,c_nan == -1) = c2_not_nan(i);
 end
 
+%%
+% * 4) Which are the new mean values of each dataset?
+
+mean_d1 = mean(d1,2)
+mean_d2 = mean(d2,2)
 
