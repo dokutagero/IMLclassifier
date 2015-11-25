@@ -22,11 +22,12 @@ mean_diabetes_attr = mean(diabetes_db.x,2)
 % * 1) Create a new dataset D1, replacing the NaN values with the mean
 % value of the corresponding attribute without considering the missing values.
 d1 = diabetes_db.x;
-for i=1:size(diabetes_db.x,2)
-    nan_pos = isnan(diabetes_db.x(:,i));
-    nan_pos_inv = ~nan_pos;
+for i=1:size(diabetes_db.x,1)
+    attr = diabetes_db.x(i,:);
+    nan_pos = isnan(diabetes_db.x(i,:));
+    attr_no_nan = ~nan_pos;
     %attr_mean(i) = mean(diabetes_db.x(nan_pos,i));
-    d1(nan_pos,i) = mean(diabetes_db.x(nan_pos_inv,i));
+    d1(i,nan_pos) = mean(diabetes_db.x(i,attr_no_nan));
 end
 %%
 % * 2) Create a new dataset D2, replacing the NaN values with the mean 
