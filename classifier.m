@@ -7,15 +7,15 @@
 %% Data set analysis
 diabetes_db = load('diabetes.mat');
 %%
-% * Which is the cardinality of the training set?
+% * Which is the cardinality of the train set?
 %
 cardinality = size(diabetes_db.x,2)
 %%
-% * Which is the dimensionality of the training set?
+% * Which is the dimensionality of the train set?
 %
 dimensionality = size(diabetes_db.x,1)
 %%
-% * Which is the mean value of the training set?
+% * Which is the mean value of the train set?
 %mean_diabetes = mean2(diabetes_db.x)
 mean_diabetes_attr = mean(diabetes_db.x,2)
 %%
@@ -65,16 +65,98 @@ mean_d2 = mean(D2,2)
 %%
 % * 1) In this model you have to learn the threshold value. Explain how you
 % can accomodate this parameter.
-[ w_D1, costFunction_D1 ] = gradient_descent( D1, diabetes_db.y, 200000, 1e-5, [1,1,1,1,1,1,1,1,1], 0.000001);
+%Set the initial parameters
+w_in = ones(1,size(D1,1)+1);
+maxIter = 200000;
+minError = 1e-5;
+t = 0.000001;
+[ w_D1, costFunction_D1 ] = gradient_descent( D1, diabetes_db.y, maxIter, minError,w_in,t );
 [ y_classified_D1 ] = linearClassifier(D1,w_D1);
 %%
 % Number of elements corretly classified with D1:
 D1_correct_class = sum(y_classified_D1 == diabetes_db.y)
 correct_rate = (D1_correct_class/length(diabetes_db.y))*100
+
 %%
-[ w_D2, costFunction_D2 ] = gradient_descent( D2, diabetes_db.y, 200000, 1e-5, [1,1,1,1,1,1,1,1,1], 0.000001);
+[ w_D2, costFunction_D2 ] = gradient_descent( D2, diabetes_db.y, maxIter, minError, w_in, t);
 [ y_classified_D2 ] = linearClassifier(D2,w_D2);
+
 %%
-% Number of elements corretly classified with D1:
+% Number of elements corretly classified with D2:
 D2_correct_class = sum(y_classified_D2 == diabetes_db.y)
 correct_rate = (D2_correct_class/length(diabetes_db.y))*100
+
+%% Normal Vectors
+%Normal vector of the hyperplane for Dataset1
+w_D1
+%Normal vector of the hyperplane for Dataset1
+w_D2
+
+%% 
+% * 1) Repeat the learning process in block 3 using just D2 but holding-out the last
+%fifth of the data set for testing purposes, i.e. use the first 4/5-th for train and
+%the last 1/5-th for testing.
+
+%%
+% a) Clear workspace
+clear all;
+close all;
+clc;
+
+%% 
+% b)Preprocess data
+diabetes_db = load('diabetes.mat');
+D2 = diabetes_db.x;
+
+for i=1:size(diabetes_db.x,1)
+    attr = diabetes_db.x(i,:);
+    attr_no_nan = ~isnan(diabetes_db.x(i,:));
+    % c is a vector containing 1 or -1 in those positions that correspond
+    % to the ith instance of data, describing its belonging to class 1 or
+    % -1. On the other hand, a 0 corresponds to a NaN element.
+    c = diabetes_db.y .* attr_no_nan';
+    c_nan = diabetes_db.y .* ~attr_no_nan';
+
+    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
+    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
+    
+    D2(i,c_nan == 1) = c1_not_nan(i);
+    D2(i,c_nan == -1) = c2_not_nan(i);
+end
+%%
+% c) Split data in two sets 
+train_size = round(size(D2,2)*4/5);
+train_data = D2(:,1:train_size);
+train_target = diabetes_db.y(1:train_size);
+test_data = D2(:,train_size+1:end);
+test_target = diabetes_db.y(train_size+1:end);
+%% 
+% d) Train model with the training set
+w_in = ones(1,size(D2,1)+1);
+maxIter = 200000;
+minError = 1e-5;
+t = 0.000001;
+[ w_train, costFunction_train ] = gradient_descent( train_data, train_target, maxIter, minError,w_in,t );
+[ y_classified_train ] = linearClassifier(train_data,w_train);
+[ y_classified_test ] = linearClassifier(test_data,w_train);
+
+
+%%
+% e) Answer the following questions:   
+%   - Which is the error rate on your training data?
+train_errors = sum(y_classified_train ~= train_target);
+train_err_rate = (train_errors/train_size) *100
+
+%   - Which is the error rate on your test data?
+test_errors = sum(y_classified_test ~= test_target);
+test_err_rate = (test_errors/length(test_target)) *100
+
+%   - Are they similar? Did you expect that behavior? Why?
+% Yes, they are similar
+%THIS EXPLANATION IS TEMPORAL JUST WRITING BASIC IDEA
+% Yes that behaviour was expected because we have replaced the Nan values
+% with the mean value of the attribute, for this the examples we reserve
+% for the test will be "similar" to those that we have used in the
+% training, achieving a good classification 
+
+
