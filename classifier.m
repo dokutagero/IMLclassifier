@@ -157,6 +157,87 @@ test_err_rate = (test_errors/length(test_target)) *100
 % Yes that behaviour was expected because we have replaced the Nan values
 % with the mean value of the attribute, for this the examples we reserve
 % for the test will be "similar" to those that we have used in the
-% training, achieving a good classification 
+% training, achieving a good classification
 
 
+%% 
+%  * 1) Repeat the process in block 4 changing the order of some of the
+% steps. Follow exactly the following steps in your process:
+
+%% 
+% a) Clear workspace
+clear all;
+close all;
+clc;
+
+%% 
+% b) Split your data in two sets: training and testing
+data = load('diabetes.mat');
+train_size = round(size(data.x,2)*4/5);
+train_data = data.x(:,1:train_size);
+train_target = data.y(1:train_size);
+test_data = data.x(:,train_size+1:end);
+test_target = data.y(train_size+1:end);
+
+%%
+
+% c) Preprocess the data replacing the NaN using the method for creating
+% D2. But this time use only the data corresponding to the training set.
+D2_train = train_data;
+
+for i=1:size(train_data,1)
+    attr = train_data(i,:);
+    attr_no_nan = ~isnan(train_data(i,:));
+    % c is a vector containing 1 or -1 in those positions that correspond
+    % to the ith instance of data, describing its belonging to class 1 or
+    % -1. On the other hand, a 0 corresponds to a NaN element.
+    c = train_target .* attr_no_nan';
+    c_nan = train_target .* ~attr_no_nan';
+
+    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
+    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
+    
+    D2_train(i,c_nan == 1) = c1_not_nan(i);
+    D2_train(i,c_nan == -1) = c2_not_nan(i);
+end
+
+%%
+% d) Train your model on the training set.
+w_in = ones(1,size(D2_train,1)+1);
+maxIter = 200000;
+minError = 1e-5;
+t = 0.000001;
+[ w_train, costFunction_train ] = gradient_descent( D2_train, train_target, maxIter, minError,w_in,t );
+[ y_classified_train ] = linearClassifier(train_data,w_train);
+
+%%
+% e) Replace the NaN values using the means computed on the training data
+D2_test = test_data;
+
+for i=1:size(test_data,1)
+    attr = test_data(i,:);
+    attr_no_nan = ~isnan(test_data(i,:));
+    c = test_target .* attr_no_nan';
+    c_nan = test_target .* ~attr_no_nan';
+    
+    D2_test(i,c_nan == 1) = c1_not_nan(i);
+    D2_test(i,c_nan == -1) = c2_not_nan(i);
+end
+
+%%
+% f) Answer the following questions: 
+%   - Which is the error rate on your training data? 
+train_errors = sum(y_classified_train ~= train_target);
+train_err_rate = (train_errors/train_size) *100
+
+%   - Which is the error rate on your test data? 
+[ y_classified_test ] = linearClassifier(D2_test,w_train);
+test_errors = sum(y_classified_test ~= test_target);
+test_err_rate = (test_errors/length(test_target)) *100
+
+%   - Are they similar? Did you expect that behavior? Why?
+
+%%
+% g) Compare these results with the ones in block 4. Do we achieve
+%   better or worse results? Why?
+%BETTER RESULTS
