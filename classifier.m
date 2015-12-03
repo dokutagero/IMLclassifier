@@ -36,23 +36,7 @@ end
 % attribute values of class +1 with the mean of that attribute of the 
 % examples of class +1, and the same for the other class.
 
-D2 = diabetes_db.x;
-
-for i=1:size(diabetes_db.x,1)
-    attr = diabetes_db.x(i,:);
-    attr_no_nan = ~isnan(diabetes_db.x(i,:));
-    % c is a vector containing 1 or -1 in those positions that correspond
-    % to the ith instance of data, describing its belonging to class 1 or
-    % -1. On the other hand, a 0 corresponds to a NaN element.
-    c = diabetes_db.y .* attr_no_nan';
-    c_nan = diabetes_db.y .* ~attr_no_nan';
-
-    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
-    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
-    
-    D2(i,c_nan == 1) = c1_not_nan(i);
-    D2(i,c_nan == -1) = c2_not_nan(i);
-end
+D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
 %%
 % * 4) Which are the new mean values of each dataset?
@@ -106,23 +90,8 @@ clc;
 %% 
 % b)Preprocess data
 diabetes_db = load('diabetes.mat');
-D2 = diabetes_db.x;
+D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
-for i=1:size(diabetes_db.x,1)
-    attr = diabetes_db.x(i,:);
-    attr_no_nan = ~isnan(diabetes_db.x(i,:));
-    % c is a vector containing 1 or -1 in those positions that correspond
-    % to the ith instance of data, describing its belonging to class 1 or
-    % -1. On the other hand, a 0 corresponds to a NaN element.
-    c = diabetes_db.y .* attr_no_nan';
-    c_nan = diabetes_db.y .* ~attr_no_nan';
-
-    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
-    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
-    
-    D2(i,c_nan == 1) = c1_not_nan(i);
-    D2(i,c_nan == -1) = c2_not_nan(i);
-end
 %%
 % c) Split data in two sets 
 train_size = round(size(D2,2)*4/5);
