@@ -66,11 +66,16 @@ mean_d2 = mean(D2,2)
 % * 1) In this model you have to learn the threshold value. Explain how you
 % can accomodate this parameter.
 %Set the initial parameters
-w_in = ones(1,size(D1,1)+1);
-maxIter = 200000;
+[meanColumns, stdevColumns, D1_norm] = normalization(D1');
+D1_norm = D1_norm';
+[meanColumns, stdevColumns, D2_norm] = normalization(D2');
+D2_norm = D2_norm';
+
+w_in = ones(1,size(D1,1)+1)*10;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
-[ w_D1, costFunction_D1 ] = gradient_descent( D1, diabetes_db.y, maxIter, minError,w_in,t );
+t = 0.001;
+[ w_D1, costFunction_D1 ] = gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
 [ y_classified_D1 ] = linearClassifier(D1,w_D1);
 %%
 % Number of elements corretly classified with D1:
@@ -78,8 +83,8 @@ D1_correct_class = sum(y_classified_D1 == diabetes_db.y)
 correct_rate = (D1_correct_class/length(diabetes_db.y))*100
 
 %%
-[ w_D2, costFunction_D2 ] = gradient_descent( D2, diabetes_db.y, maxIter, minError, w_in, t);
-[ y_classified_D2 ] = linearClassifier(D2,w_D2);
+[ w_D2, costFunction_D2 ] = gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
+[ y_classified_D2 ] = linearClassifier(D2_norm,w_D2);
 
 %%
 % Number of elements corretly classified with D2:
@@ -125,6 +130,9 @@ for i=1:size(diabetes_db.x,1)
 end
 %%
 % c) Split data in two sets 
+[meanColumns, stdevColumns, D2_norm] = normalization(D2');
+D2_norm = D2_norm';
+%Will add a function for normalizing in a more clean way
 train_size = round(size(D2,2)*4/5);
 train_data = D2(:,1:train_size);
 train_target = diabetes_db.y(1:train_size);
@@ -133,9 +141,9 @@ test_target = diabetes_db.y(train_size+1:end);
 %% 
 % d) Train model with the training set
 w_in = ones(1,size(D2,1)+1);
-maxIter = 200000;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
+t = 0.001;
 [ w_train, costFunction_train ] = gradient_descent( train_data, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 [ y_classified_test ] = linearClassifier(test_data,w_train);
@@ -204,9 +212,9 @@ end
 %%
 % d) Train your model on the training set.
 w_in = ones(1,size(D2_train,1)+1);
-maxIter = 200000;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
+t = 0.001;
 [ w_train, costFunction_train ] = gradient_descent( D2_train, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 
