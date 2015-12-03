@@ -4,3 +4,4 @@ html
 *.asv
 *.pdf
 *.*~
+*DS_Store
