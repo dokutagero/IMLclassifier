@@ -36,23 +36,7 @@ end
 % attribute values of class +1 with the mean of that attribute of the 
 % examples of class +1, and the same for the other class.
 
-D2 = diabetes_db.x;
-
-for i=1:size(diabetes_db.x,1)
-    attr = diabetes_db.x(i,:);
-    attr_no_nan = ~isnan(diabetes_db.x(i,:));
-    % c is a vector containing 1 or -1 in those positions that correspond
-    % to the ith instance of data, describing its belonging to class 1 or
-    % -1. On the other hand, a 0 corresponds to a NaN element.
-    c = diabetes_db.y .* attr_no_nan';
-    c_nan = diabetes_db.y .* ~attr_no_nan';
-
-    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
-    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
-    
-    D2(i,c_nan == 1) = c1_not_nan(i);
-    D2(i,c_nan == -1) = c2_not_nan(i);
-end
+D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
 %%
 % * 4) Which are the new mean values of each dataset?
@@ -66,11 +50,16 @@ mean_d2 = mean(D2,2)
 % * 1) In this model you have to learn the threshold value. Explain how you
 % can accomodate this parameter.
 %Set the initial parameters
-w_in = ones(1,size(D1,1)+1);
-maxIter = 200000;
+[meanColumns, stdevColumns, D1_norm] = normalization(D1');
+D1_norm = D1_norm';
+[meanColumns, stdevColumns, D2_norm] = normalization(D2');
+D2_norm = D2_norm';
+
+w_in = ones(1,size(D1,1)+1)*10;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
-[ w_D1, costFunction_D1 ] = gradient_descent( D1, diabetes_db.y, maxIter, minError,w_in,t );
+t = 0.001;
+[ w_D1, costFunction_D1 ] = gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
 [ y_classified_D1 ] = linearClassifier(D1,w_D1);
 %%
 % Number of elements corretly classified with D1:
@@ -78,8 +67,8 @@ D1_correct_class = sum(y_classified_D1 == diabetes_db.y)
 correct_rate = (D1_correct_class/length(diabetes_db.y))*100
 
 %%
-[ w_D2, costFunction_D2 ] = gradient_descent( D2, diabetes_db.y, maxIter, minError, w_in, t);
-[ y_classified_D2 ] = linearClassifier(D2,w_D2);
+[ w_D2, costFunction_D2 ] = gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
+[ y_classified_D2 ] = linearClassifier(D2_norm,w_D2);
 
 %%
 % Number of elements corretly classified with D2:
@@ -106,25 +95,13 @@ clc;
 %% 
 % b)Preprocess data
 diabetes_db = load('diabetes.mat');
-D2 = diabetes_db.x;
+D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
-for i=1:size(diabetes_db.x,1)
-    attr = diabetes_db.x(i,:);
-    attr_no_nan = ~isnan(diabetes_db.x(i,:));
-    % c is a vector containing 1 or -1 in those positions that correspond
-    % to the ith instance of data, describing its belonging to class 1 or
-    % -1. On the other hand, a 0 corresponds to a NaN element.
-    c = diabetes_db.y .* attr_no_nan';
-    c_nan = diabetes_db.y .* ~attr_no_nan';
-
-    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
-    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
-    
-    D2(i,c_nan == 1) = c1_not_nan(i);
-    D2(i,c_nan == -1) = c2_not_nan(i);
-end
 %%
 % c) Split data in two sets 
+[meanColumns, stdevColumns, D2] = normalization(D2');
+D2 = D2';
+%Will add a function for normalizing in a more clean way
 train_size = round(size(D2,2)*4/5);
 train_data = D2(:,1:train_size);
 train_target = diabetes_db.y(1:train_size);
@@ -133,9 +110,9 @@ test_target = diabetes_db.y(train_size+1:end);
 %% 
 % d) Train model with the training set
 w_in = ones(1,size(D2,1)+1);
-maxIter = 200000;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
+t = 0.001;
 [ w_train, costFunction_train ] = gradient_descent( train_data, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 [ y_classified_test ] = linearClassifier(test_data,w_train);
@@ -201,12 +178,15 @@ for i=1:size(train_data,1)
     D2_train(i,c_nan == -1) = c2_not_nan(i);
 end
 
+[meanColumns, stdevColumns, D2_train] = normalization(D2_train');
+D2_train = D2_train';
+
 %%
 % d) Train your model on the training set.
 w_in = ones(1,size(D2_train,1)+1);
-maxIter = 200000;
+maxIter = 10000;
 minError = 1e-5;
-t = 0.000001;
+t = 0.001;
 [ w_train, costFunction_train ] = gradient_descent( D2_train, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 
@@ -223,6 +203,9 @@ for i=1:size(test_data,1)
     D2_test(i,c_nan == 1) = c1_not_nan(i);
     D2_test(i,c_nan == -1) = c2_not_nan(i);
 end
+
+[meanColumns, stdevColumns, D2_test] = normalization(D2_test');
+D2_test = D2_test';
 
 %%
 % f) Answer the following questions: 
