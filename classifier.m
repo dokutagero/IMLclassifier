@@ -99,8 +99,8 @@ D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
 %%
 % c) Split data in two sets 
-[meanColumns, stdevColumns, D2_norm] = normalization(D2');
-D2_norm = D2_norm';
+[meanColumns, stdevColumns, D2] = normalization(D2');
+D2 = D2';
 %Will add a function for normalizing in a more clean way
 train_size = round(size(D2,2)*4/5);
 train_data = D2(:,1:train_size);
@@ -178,6 +178,9 @@ for i=1:size(train_data,1)
     D2_train(i,c_nan == -1) = c2_not_nan(i);
 end
 
+[meanColumns, stdevColumns, D2_train] = normalization(D2_train');
+D2_train = D2_train';
+
 %%
 % d) Train your model on the training set.
 w_in = ones(1,size(D2_train,1)+1);
@@ -200,6 +203,9 @@ for i=1:size(test_data,1)
     D2_test(i,c_nan == 1) = c1_not_nan(i);
     D2_test(i,c_nan == -1) = c2_not_nan(i);
 end
+
+[meanColumns, stdevColumns, D2_test] = normalization(D2_test');
+D2_test = D2_test';
 
 %%
 % f) Answer the following questions: 
