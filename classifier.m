@@ -214,10 +214,26 @@ test_err_rate = (test_errors/length(test_target)) *100
 % and testing. Plot a graph with the training and test error rates for each
 % splitting percentage point. Comment the results.
 clear all
-times = 5;
+times = 10;
 
 for i = 1:times-1
    block5    
+   train_rate(i) = train_err_rate;
+   test_rate(i) = test_err_rate;
+end
+
+figure;
+plot((1:times-1),train_rate);
+hold on;
+plot((1:times-1),test_rate,'r');
+legend('Train error rate','Test error rate')
+
+%% Testing analytical solution
+clear all;
+times=10;
+
+for i = 1:times-1
+   block5_analitic
    train_rate(i) = train_err_rate;
    test_rate(i) = test_err_rate;
 end
