@@ -55,10 +55,10 @@ D1_norm = D1_norm';
 [meanColumns, stdevColumns, D2_norm] = normalization(D2');
 D2_norm = D2_norm';
 
-w_in = ones(1,size(D1,1)+1)*10;
+w_in = zeros(1,size(D1,1)+1)*10;
 maxIter = 10000;
 minError = 1e-5;
-t = 0.001;
+t = 0.01;
 [ w_D1, costFunction_D1 ] = gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
 [ y_classified_D1 ] = linearClassifier(D1,w_D1);
 %%
@@ -109,10 +109,10 @@ test_data = D2(:,train_size+1:end);
 test_target = diabetes_db.y(train_size+1:end);
 %% 
 % d) Train model with the training set
-w_in = ones(1,size(D2,1)+1);
+w_in = zeros(1,size(D2,1)+1);
 maxIter = 10000;
 minError = 1e-5;
-t = 0.001;
+t = 0.01;
 [ w_train, costFunction_train ] = gradient_descent( train_data, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 [ y_classified_test ] = linearClassifier(test_data,w_train);
@@ -167,10 +167,10 @@ D2_train = D2_train';
 
 %%
 % d) Train your model on the training set.
-w_in = ones(1,size(D2_train,1)+1);
+w_in = zeros(1,size(D2_train,1)+1);
 maxIter = 10000;
 minError = 1e-5;
-t = 0.001;
+t = 0.01;
 [ w_train, costFunction_train ] = gradient_descent( D2_train, train_target, maxIter, minError,w_in,t );
 [ y_classified_train ] = linearClassifier(D2_train,w_train);
 
@@ -208,3 +208,22 @@ test_err_rate = (test_errors/length(test_target)) *100
 % g) Compare these results with the ones in block 4. Do we achieve
 %   better or worse results? Why?
 %BETTER RESULTS
+
+%% 
+% * 1) Repeat the process in block 5 changing the percentage of the data for training
+% and testing. Plot a graph with the training and test error rates for each
+% splitting percentage point. Comment the results.
+clear all
+times = 5;
+
+for i = 1:times-1
+   block5    
+   train_rate(i) = train_err_rate;
+   test_rate(i) = test_err_rate;
+end
+
+figure;
+plot((1:times-1),train_rate);
+hold on;
+plot((1:times-1),test_rate,'r');
+legend('Train error rate','Test error rate')
