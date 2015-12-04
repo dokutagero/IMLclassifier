@@ -1,4 +1,4 @@
-function [meanColumns, stdevColumns, normalizedData] = normalization(matData)
+function [meanColumns, stdevColumns, normalizedData] = normalization(matData, varargin)
 % Description: Function takes data contained in a matrix and returns
 % normalized data. Normalization is done by calculating the z-score. 
 % While normalizing the data in this manner it is assumed that the data 
@@ -14,8 +14,15 @@ function [meanColumns, stdevColumns, normalizedData] = normalization(matData)
 % [columnMeans, columnStdev, normalizedData] = normalization(matrixData)
 normalizedData = [];
 sizeMatData = size(matData); 
-meanColumns = mean(matData);
-stdevColumns = std(matData);
+
+if nargin >1 
+    meanColumns = varargin{1};
+    stdevColumns = varargin{2};
+else 
+    meanColumns = mean(matData);
+    stdevColumns = std(matData);
+end
+
 for nCol = 1:sizeMatData(2)
     if stdevColumns(:,nCol) == 0
         normalizedData(:,nCol) = 0;

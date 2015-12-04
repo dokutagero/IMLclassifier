@@ -160,23 +160,7 @@ test_target = data.y(train_size+1:end);
 
 % c) Preprocess the data replacing the NaN using the method for creating
 % D2. But this time use only the data corresponding to the training set.
-D2_train = train_data;
-
-for i=1:size(train_data,1)
-    attr = train_data(i,:);
-    attr_no_nan = ~isnan(train_data(i,:));
-    % c is a vector containing 1 or -1 in those positions that correspond
-    % to the ith instance of data, describing its belonging to class 1 or
-    % -1. On the other hand, a 0 corresponds to a NaN element.
-    c = train_target .* attr_no_nan';
-    c_nan = train_target .* ~attr_no_nan';
-
-    c1_not_nan(i) = sum(attr(find(c == 1))) / length(find(c==1));
-    c2_not_nan(i) = sum(attr(find(c == -1))) / length(find(c==-1));
-    
-    D2_train(i,c_nan == 1) = c1_not_nan(i);
-    D2_train(i,c_nan == -1) = c2_not_nan(i);
-end
+[D2_train,c1_means,c2_means] = preprocessData2(train_data,train_target);
 
 [meanColumns, stdevColumns, D2_train] = normalization(D2_train');
 D2_train = D2_train';
@@ -188,7 +172,7 @@ maxIter = 10000;
 minError = 1e-5;
 t = 0.001;
 [ w_train, costFunction_train ] = gradient_descent( D2_train, train_target, maxIter, minError,w_in,t );
-[ y_classified_train ] = linearClassifier(train_data,w_train);
+[ y_classified_train ] = linearClassifier(D2_train,w_train);
 
 %%
 % e) Replace the NaN values using the means computed on the training data
@@ -200,11 +184,11 @@ for i=1:size(test_data,1)
     c = test_target .* attr_no_nan';
     c_nan = test_target .* ~attr_no_nan';
     
-    D2_test(i,c_nan == 1) = c1_not_nan(i);
-    D2_test(i,c_nan == -1) = c2_not_nan(i);
+    D2_test(i,c_nan == 1) = c1_means(i);
+    D2_test(i,c_nan == -1) = c2_means(i);
 end
 
-[meanColumns, stdevColumns, D2_test] = normalization(D2_test');
+[meanColumns, stdevColumns, D2_test] = normalization(D2_test',meanColumns, stdevColumns);
 D2_test = D2_test';
 
 %%

@@ -1,4 +1,4 @@
-function [ D2 ] = preprocessData2( data, target )
+function [ D2, c1_not_nan, c2_not_nan ] = preprocessData2( data, target )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 D2 = data;
@@ -18,4 +18,3 @@ for i=1:size(data,1)
     D2(i,c_nan == -1) = c2_not_nan(i);
 end
 end
-
