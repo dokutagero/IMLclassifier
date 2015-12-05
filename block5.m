@@ -5,6 +5,7 @@ train_target = data.y(1:train_size);
 test_data = data.x(:,train_size+1:end);
 test_target = data.y(train_size+1:end);
 
+N(i) = train_size;
 %%
 
 % c) Preprocess the data replacing the NaN using the method for creating

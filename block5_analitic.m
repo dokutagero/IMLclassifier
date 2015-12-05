@@ -5,6 +5,8 @@ train_target = data.y(1:train_size);
 test_data = data.x(:,train_size+1:end);
 test_target = data.y(train_size+1:end);
 
+N(i) = train_size;
+
 %Process data
 [D2_train,c1_means,c2_means] = preprocessData2(train_data,train_target);
 

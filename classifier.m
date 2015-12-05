@@ -231,6 +231,8 @@ legend('Train error rate','Test error rate')
 %% Testing analytical solution
 clear all;
 times=10;
+%size of training
+N = zeros(1,times-1);
 
 for i = 1:times-1
    block5_analitic
@@ -243,3 +245,15 @@ plot((1:times-1),train_rate);
 hold on;
 plot((1:times-1),test_rate,'r');
 legend('Train error rate','Test error rate')
+
+%%
+% 2)
+
+upperBound = zeros(1,length(N));
+dVC = 9;
+delta = 0.01;
+for j=1:length(N);
+    upperBound(j) =  test_rate(j) + sqrt((dVC*(log10(2*N(j)/dVC)+1) + log10(2/delta))/(2*N(j)));
+end
+hold on
+plot(upperBound,'g')
