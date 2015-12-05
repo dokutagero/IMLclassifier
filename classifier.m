@@ -249,11 +249,27 @@ legend('Train error rate','Test error rate')
 %%
 % 2)
 
+%Not sure if log10, log (in matlab is ln) or log2
 upperBound = zeros(1,length(N));
 dVC = 9;
 delta = 0.01;
 for j=1:length(N);
-    upperBound(j) =  test_rate(j) + sqrt((dVC*(log10(2*N(j)/dVC)+1) + log10(2/delta))/(2*N(j)));
+    upperBound(j) =  test_rate(j) + sqrt((dVC*(log(2*N(j)/dVC)+1) + log(2/delta))/(2*N(j)));
 end
 hold on
 plot(upperBound,'g')
+
+%%
+% 3)
+syms n
+delta = 0.05
+error_deviation = 0.01;
+n = solve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == error_deviation, n);
+eval(n)
+%Some notes: slide 61/73 has the expression of VC. From the data given in
+%the last question, the % error deviation should be the difference between
+%the training and testing. On the other hand, the confidence is 1-delta. I
+%supposed that isolation the n value, which is the number of training
+%samples that would give the given error dev and confidence. After some
+%discussion with Marco, it seems that the question is not actually this
+%one. We are not sure exactly how to proceed.
