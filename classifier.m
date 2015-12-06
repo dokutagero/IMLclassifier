@@ -108,8 +108,26 @@ t = 0.01;
     gradient_descent( D3_norm, diabetes_db.y, maxIter, minError, w_in, t);
 [ y_classified_D3 ] = linearClassifier(D3_norm,w_D3);
 %%
-% Explanation about the question.
+% Considering that our classifier uses a linear regression method for
+% classifying our data, we define the belonging to the class 1 like the
+% following expression
 %%
+% $$ \sum_i^dw_{i}x_{i}>threshold $$
+%%
+% While the belonging to the -1 class is defined as
+%%
+% $$ \sum_i^dw_{i}x_{i}\leq threshold $$
+%%
+% Then, we define our linear classifier function as follows:
+%%
+% $$ h(x) = sign(\sum_i^dw_{i}x_{i}+w_{0}) $$
+%%
+% Where $$ w_{0} $$ is  $$ -threshold $$.
+%%
+%%
+D1_threshold = -w_D1(1)
+D2_threshold = -w_D2(1)
+D3_threshold = -w_D3(1)
 % |*3) Compute the error rates achieved on the training data. Are there
 % significant differences? Report the method used and their parameters.*|
 %%
