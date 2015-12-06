@@ -45,7 +45,7 @@ end
 % values of class +1 with the mean of that attribute of the examples of
 % class +1, and the same for the other class.*|
 
-D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
+D2 = preprocessData(diabetes_db.x,diabetes_db.y);
 %%
 % |*3) [Optional :] Explain another method to deal with missing values and
 % apply it to preprocess the training data. Include the reference of the
