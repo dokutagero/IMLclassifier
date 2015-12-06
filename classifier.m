@@ -237,6 +237,8 @@ test_err_rate = (test_errors/length(test_target)) *100;
 train_err_rate
 test_err_rate
 %%
+%   - Are they similar? Did you expect that behavior? Why?
+
 % The values obtained for the training error rate and test error rate are
 % available above. Both error rates are very similar, having only a
 % difference of around 1% error rate. This behaviour was expected since
@@ -328,10 +330,22 @@ test_err_rate
 
 %   - Are they similar? Did you expect that behavior? Why?
 
+% Yes, they are similar. This was not a expect result due to the fact that
+% the first thing we are doing is split the data. Then, we substitute the
+% NaN values with the average of the attribute but just taking into account
+% the training data. Therefore, any test information was added in the
+% training data and for this we expected a bad result. Nevertheless this
+% fact was not finally reflected.
 %%
 % g) Compare these results with the ones in block 4. Do we achieve
 %   better or worse results? Why?
-%BETTER RESULTS
+
+% We achieve an identical result. After much thought and comparison of
+% results with other groups, we realise that those ones who were applying
+% an analitical approximation, found very small differences in their
+% results. In our case, the result is identical, this can be due to the
+% fact that with applying a gradient descent method, more computations are
+% needed, what can  lead to loss of accuracy.
 %%
 % |*Question block 6*|
 %%
