@@ -171,7 +171,7 @@ clc;
 %% 
 % b)Preprocess data replacing NaN using the method for creating D2.
 diabetes_db = load('diabetes.mat');
-D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
+D2 = preprocessData(diabetes_db.x,diabetes_db.y);
 
 %%
 % c) Split data in two sets: first 4/5-th is to be used for training and
@@ -252,7 +252,7 @@ test_target = data.y(train_size+1:end);
 
 %c1_means have values of the dataset that belong to class -1 while c2_means
 %has the value for class -1
-[D2_train,c1_means,c2_means] = preprocessData2(train_data,train_target);
+[D2_train,c1_means,c2_means] = preprocessData(train_data,train_target);
 
 %In this case, beside normalizing the training dataset, we obtain the mean
 %and standard deviation from it for normalizing the test dataset.
