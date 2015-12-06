@@ -50,4 +50,4 @@ train_err_rate = (train_errors/train_size) *100;
 %   - Which is the error rate on your test data? 
 [ y_classified_test ] = linearClassifier(D2_test,w_train);
 test_errors = sum(y_classified_test ~= test_target);
-test_err_rate = (test_errors/length(test_target)) *100
+test_err_rate = (test_errors/length(test_target)) *100;

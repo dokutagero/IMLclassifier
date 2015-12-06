@@ -108,6 +108,21 @@ t = 0.01;
     gradient_descent( D3_norm, diabetes_db.y, maxIter, minError, w_in, t);
 [ y_classified_D3 ] = linearClassifier(D3_norm,w_D3);
 %%
+% Considering that we used gradient descent for the classification problem,
+% we decided to normalize the data. In this particular problem, the
+% normalization would not modify at all the classification task, but the
+% initial values and convergence of the method improves significantly. The
+% normalization was performed using a function from our first assignment,
+% and only transpose transformation has to be performed for reusing it
+% since the structure of the dataset is different than the given in the
+% first assignment. The normalization made the method converge more quickly
+% while giving the ability of having a representation of the cost function
+% much easily.
+%%
+% Cost function for the dataset D2
+plot(costFunction_D2)
+title('Cost Function for D2')
+%%
 % Considering that our classifier uses a linear regression method for
 % classifying our data, we define the belonging to the class 1 like the
 % following expression
