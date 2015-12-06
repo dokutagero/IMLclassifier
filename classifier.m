@@ -9,6 +9,7 @@
 diabetes_db = load('diabetes.mat');
 %%
 % |*Question block 1:*|
+%%
 % |*1) Which is the cardinality of the train set?*|
 
 % Cardinality of the training dataset
@@ -25,6 +26,7 @@ dimensionality = size(diabetes_db.x,1)
 mean_diabetes_attr = mean(diabetes_db.x,2)
 %%
 % |*Question block 2:*|
+%%
 % |*1) Create a new dataset D1, replacing the NaN values with the mean
 % value of the corresponding attribute without considering the missing
 % values.*|
@@ -68,54 +70,74 @@ D3 = knnimpute(diabetes_db.x', 5)';
 %%
 % |*4) Which are the new mean values of each dataset?*|
 
-mean_d1 = mean(D1,2);
-mean_d2 = mean(D2,2);
-mean_d3 = mean(D3,2);
+mean_d1 = mean(D1,2)
+mean_d2 = mean(D2,2)
+mean_d3 = mean(D3,2)
 
 %% C. A Simple Classifier
 %%
 % |*Question block 3:*|
+%%
 % |*1) In this model you have to learn the threshold value. Explain how you
 % can accomodate this parameter.*|
 
-%Set the initial parameters
+%Normalize data 
 [meanColumns, stdevColumns, D1_norm] = normalization(D1');
 D1_norm = D1_norm';
 [meanColumns, stdevColumns, D2_norm] = normalization(D2');
 D2_norm = D2_norm';
-
+[meanColumns, stdevColumns, D3_norm] = normalization(D3');
+D3_norm = D3_norm';
+%Set the initial parameters
 w_in = zeros(1,size(D1,1)+1)*10;
 maxIter = 10000;
 minError = 1e-5;
 t = 0.01;
+
+%Obtain the linear regression using gradient descend in all the datasets.
 [ w_D1, costFunction_D1 ] = ...
     gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
-[ y_classified_D1 ] = linearClassifier(D1,w_D1);
+[ y_classified_D1 ] = linearClassifier(D1_norm,w_D1);
+
+
+[ w_D2, costFunction_D2 ] = ...
+    gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
+[ y_classified_D2 ] = linearClassifier(D2_norm,w_D2);
+
+
+[ w_D3, costFunction_D3 ] = ...
+    gradient_descent( D3_norm, diabetes_db.y, maxIter, minError, w_in, t);
+[ y_classified_D3 ] = linearClassifier(D3_norm,w_D3);
+%%
+% Explanation about the question.
 %%
 % |*3) Compute the error rates achieved on the training data. Are there
 % significant differences? Report the method used and their parameters.*|
 %%
 % Number of elements corretly classified with D1:
 D1_correct_class = sum(y_classified_D1 == diabetes_db.y);
-correct_rate_D1 = (D1_correct_class/length(diabetes_db.y))*100;
+correct_rate_D1 = (D1_correct_class/length(diabetes_db.y))*100
 
-%
-[ w_D2, costFunction_D2 ] = ...
-    gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
-[ y_classified_D2 ] = linearClassifier(D2_norm,w_D2);
-
-%
 % Number of elements corretly classified with D2:
 D2_correct_class = sum(y_classified_D2 == diabetes_db.y);
-correct_rate_D2 = (D2_correct_class/length(diabetes_db.y))*100;
+correct_rate_D2 = (D2_correct_class/length(diabetes_db.y))*100
+
+% Number of elements corretly classified with D2:
+D3_correct_class = sum(y_classified_D3 == diabetes_db.y);
+correct_rate_D3 = (D3_correct_class/length(diabetes_db.y))*100
+%%
+%%
+% Explanation about method and parameters (values of weights).
 %%
 % |*2) Report the normal vector of the separating hyperplane for each
 % data set D1, D2, D3.*|
 %%
 %Normal vector of the hyperplane for Dataset1
 w_D1
-%Normal vector of the hyperplane for Dataset1
+%Normal vector of the hyperplane for Dataset2
 w_D2
+%Normal vector of the hyperplane for Dataset3
+w_D3
 %%
 % |*Question block 4*|
 %%
@@ -130,27 +152,30 @@ close all;
 clc;
 
 %% 
-% b)Preprocess data
+% b)Preprocess data replacing NaN using the method for creating D2.
 diabetes_db = load('diabetes.mat');
 D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
 
 %%
-% c) Split data in two sets 
+% c) Split data in two sets: first 4/5-th is to be used for training and
+% the last 1/5-th will be used for testing purposes.
 [meanColumns, stdevColumns, D2] = normalization(D2');
 D2 = D2';
-%Will add a function for normalizing in a more clean way
+
 train_size = round(size(D2,2)*4/5);
 train_data = D2(:,1:train_size);
 train_target = diabetes_db.y(1:train_size);
 test_data = D2(:,train_size+1:end);
 test_target = diabetes_db.y(train_size+1:end);
 %% 
-% d) Train model with the training set
+% d) Train model on the training set
 w_in = zeros(1,size(D2,1)+1);
 maxIter = 10000;
 minError = 1e-5;
 t = 0.01;
 [ w_train, costFunction_train ] = gradient_descent( train_data, train_target, maxIter, minError,w_in,t );
+% Classification of training and test with the weights obtained using the
+% training dataset.
 [ y_classified_train ] = linearClassifier(train_data,w_train);
 [ y_classified_test ] = linearClassifier(test_data,w_train);
 
@@ -171,8 +196,13 @@ test_err_rate = (test_errors/length(test_target)) *100;
 % Yes that behaviour was expected because we have replaced the Nan values
 % with the mean value of the attribute, for this the examples we reserve
 % for the test will be "similar" to those that we have used in the
-% training, achieving a good classification
-
+% training, achieving a good classification.
+% Maybe really similar samples in both train and testing???
+%%
+mean_test_data = mean(test_data, 2)
+mean_train_data = mean(train_data, 2)
+train_err_rate
+test_err_rate
 %%
 % |*Question block 5*|
 %%
@@ -187,7 +217,8 @@ close all;
 clc;
 
 %% 
-% b) Split your data in two sets: training and testing
+% b) Split data in two sets: first 4/5-th is to be used for training and
+% the last 1/5-th will be used for testing purposes.
 data = load('diabetes.mat');
 train_size = round(size(data.x,2)*4/5);
 train_data = data.x(:,1:train_size);
@@ -315,3 +346,5 @@ eval(n);
 %samples that would give the given error dev and confidence. After some
 %discussion with Marco, it seems that the question is not actually this
 %one. We are not sure exactly how to proceed.
+
+close all
