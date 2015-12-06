@@ -247,10 +247,8 @@ test_err_rate
 %%
 % |*Question block 5*|
 %%
-
 % |*1) Repeat the process in block 4 changing the order of some of the
 % steps. Follow exactly the following steps in your process:*|
-
 %% 
 % a) Clear workspace
 clear all;

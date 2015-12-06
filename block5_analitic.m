@@ -36,8 +36,8 @@ D2_test = D2_test';
 % Measure errors
 [ y_classified_train ] = linearClassifier(D2_train,w_train);
 train_errors = sum(y_classified_train ~= train_target);
-train_err_rate = (train_errors/train_size) *100
+train_err_rate = (train_errors/train_size) *100;
 
 [ y_classified_test ] = linearClassifier(D2_test,w_train);
 test_errors = sum(y_classified_test ~= test_target);
-test_err_rate = (test_errors/length(test_target)) *100
+test_err_rate = (test_errors/length(test_target)) *100;
