@@ -347,7 +347,6 @@ test_err_rate
 %%
 % |*Question block 6*|
 %%
-
 % |*1) Repeat the process in block 5 changing the percentage of the data for
 % training and testing. Plot a graph with the training and test error rates
 % for each splitting percentage point. Comment the results.*|
@@ -365,29 +364,34 @@ plot((1:times-1),train_rate);
 hold on;
 plot((1:times-1),test_rate,'r');
 legend('Train error rate','Test error rate');
-
-%% Testing analytical solution
-clear all;
-times=10;
-%size of training
-N = zeros(1,times-1);
-
-for i = 1:times-1
-   block5_analitic;
-   train_rate(i) = train_err_rate/100;
-   test_rate(i) = test_err_rate/100;
-end
-
-figure;
-plot((1:times-1),train_rate);
-hold on;
-plot((1:times-1),test_rate,'r');
-legend('Train error rate','Test error rate')
-
+title('Gradiend descent')
+xlabel('i/10th of the dataset for training')
+ylabel('error rate')
 %%
-% 2)
+% In some intervals, the training error is higher than the test error.
+%% 
+% Testing analytical solution for comparison with gradient descent.
+% clear all;
+% times=10;
+% %size of training
+% N = zeros(1,times-1);
+% 
+% for i = 1:times-1
+%    block5_analitic;
+%    train_rate(i) = train_err_rate/100;
+%    test_rate(i) = test_err_rate/100;
+% end
+% 
+% figure;
+% plot((1:times-1),train_rate);
+% hold on;
+% plot((1:times-1),test_rate,'r');
+% legend('Train error rate','Test error rate')
+% title('Analytical version')
+%%
+% 2) Add to the plot the upper bound on the generalization error using the
+% equation of the slides for VC dimension equal to d+1. Discuss the result.
 
-%Not sure if log10, log (in matlab is ln) or log2
 upperBound = zeros(1,length(N));
 dVC = 9;
 delta = 0.01;
@@ -396,34 +400,58 @@ for j=1:length(N);
 end
 hold on
 plot(upperBound,'g');
-
 %%
-% 3)
-syms n n2;
-delta = 0.05;
+% 3) How many samples does the bound predict in order to have 1% error
+% deviation with a confidence of 95%? And with 50%? What about 5% and 10%
+% error deviation with 95%? Comment the behavior according to your
+% observations.
+%%
+% For solving this part of the block 6, after trying to solve the VC
+% equation given in the slides and comparing the approaches of other
+% groups, in order to use built-in functions to solve it we had to simplify
+% the VC expression using logarithm properties.
+%%
+% *1% error deviation and 95% of confidence.*
+%%
+confidence = 0.95;
 error_deviation = 0.01;
-n = vpasolve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == ...
-    error_deviation, n);
-%n = solve(error_deviation == sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))), n);
-n2 = solve(error_deviation == sqrt((log((2*n2*exp(1) / dVC)^dVC * (2/delta)))/(2*n2)), n2) ;
+dVC = 9;
+[ N ] = VC_Nsolver( error_deviation, confidence, dVC );
+eval(N)
+%%
+% The value obtained is very high. This is due to in order to satisfy such
+% a restrictive conditions (1% error deviation and 95% of confidence) we
+% need a large amount of data samples in our training dataset.
+%%
+% *1% error deviation and 50% of confidence.*
+%%
+confidence = 0.5;
+error_deviation = 0.01;
+dVC = 9;
+[ N ] = VC_Nsolver( error_deviation, confidence, dVC );
+eval(N)
+%%
+% *5% error deviation and 95% of confidence.*
+%%
+confidence = 0.95;
+error_deviation = 0.05;
+dVC = 9;
+[ N ] = VC_Nsolver( error_deviation, confidence, dVC );
+eval(N)
+%%
+% *10% error deviation and 95% of confidence.*
+%%
+confidence = 0.95;
+error_deviation = 0.1;
+dVC = 9;
 
-eval(n)
-eval(n2)
-
-% clear; clc;
-% delta = 0.05; % confidence 95%
-% deviationError = 0.01; % variance 1%
-% dVC = 9;
-% 
-% syms N;
-% sol1 = solve(sqrt( log( ((((2*N*exp(1))/dVC)^dVC) * (2/delta) ) - exp(2*N) )) == deviationError, N) ;
-% fprintf('Result 1: \n');
-% disp(sol1);
-%Some notes: slide 61/73 has the expression of VC. From the data given in
-%the last question, the % error deviation should be the difference between
-%the training and testing. On the other hand, the confidence is 1-delta. I
-%supposed that isolation the n value, which is the number of training
-%samples that would give the given error dev and confidence. After some
-%discussion with Marco, it seems that the question is not actually this
-%one. We are not sure exactly how to proceed.
-
+[ N ] = VC_Nsolver( error_deviation, confidence, dVC );
+eval(N)
+%%
+% As we can see, the most restrictive part is the error deviation. Making
+% the predicted value in the testing phase not deviate from the error in
+% the training phase carries more weight in complexity. We can see from the
+% results above that when decreasing the error deviation the number of
+% samples needed in training phase decrease considerably, changing from a
+% scale of 1e5 to 1e3 when increasing the error from 1% to 10%.
+%%
