@@ -128,23 +128,7 @@ t = 0.01;
 D1_threshold = -w_D1(1)
 D2_threshold = -w_D2(1)
 D3_threshold = -w_D3(1)
-% |*3) Compute the error rates achieved on the training data. Are there
-% significant differences? Report the method used and their parameters.*|
-%%
-% Number of elements corretly classified with D1:
-D1_correct_class = sum(y_classified_D1 == diabetes_db.y);
-correct_rate_D1 = (D1_correct_class/length(diabetes_db.y))*100
 
-% Number of elements corretly classified with D2:
-D2_correct_class = sum(y_classified_D2 == diabetes_db.y);
-correct_rate_D2 = (D2_correct_class/length(diabetes_db.y))*100
-
-% Number of elements corretly classified with D2:
-D3_correct_class = sum(y_classified_D3 == diabetes_db.y);
-correct_rate_D3 = (D3_correct_class/length(diabetes_db.y))*100
-%%
-%%
-% Explanation about method and parameters (values of weights).
 %%
 % |*2) Report the normal vector of the separating hyperplane for each
 % data set D1, D2, D3.*|
@@ -155,6 +139,31 @@ w_D1
 w_D2
 %Normal vector of the hyperplane for Dataset3
 w_D3
+%%
+% |*3) Compute the error rates achieved on the training data. Are there
+% significant differences?*|
+
+%%
+D1_correct_class = sum(y_classified_D1 == diabetes_db.y);
+correct_rate_D1 = (D1_correct_class/length(diabetes_db.y))*100;
+error_rate_D1 = 100 - correct_rate_D1
+
+% Number of elements corretly classified with D2:
+D2_correct_class = sum(y_classified_D2 == diabetes_db.y);
+correct_rate_D2 = (D2_correct_class/length(diabetes_db.y))*100;
+error_rate_D2 = 100 - correct_rate_D2
+
+
+% Number of elements corretly classified with D2:
+D3_correct_class = sum(y_classified_D3 == diabetes_db.y);
+correct_rate_D3 = (D3_correct_class/length(diabetes_db.y))*100;
+error_rate_D3 = 100 - correct_rate_D3
+
+%%
+% The error rates where calculated using the labels provided with the
+% dataset. Comparing one by one the elements classified in the training
+% phase with the actual labels provided. There are no significant
+% differences between the datasets, being D2 the one with better results.
 %%
 % |*Question block 4*|
 %%
