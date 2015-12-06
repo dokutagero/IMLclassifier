@@ -224,8 +224,10 @@ t = 0.01;
 
 
 %%
-% e) Answer the following questions:   
-%   - Which is the error rate on your training data?
+% e) Answer the following questions: Which is the error rate on your test 
+% data? Are they similar? Did you expect that behavior? Why?   
+%
+%- Which is the error rate on your training data?
 train_errors = sum(y_classified_train ~= train_target);
 train_err_rate = (train_errors/train_size) *100;
 
@@ -249,10 +251,8 @@ test_err_rate
 %%
 % |*Question block 5*|
 %%
-
 % |*1) Repeat the process in block 4 changing the order of some of the
 % steps. Follow exactly the following steps in your process:*|
-
 %% 
 % a) Clear workspace
 clear all;
@@ -270,7 +270,6 @@ test_data = data.x(:,train_size+1:end);
 test_target = data.y(train_size+1:end);
 
 %%
-
 % c) Preprocess the data replacing the NaN using the method for creating
 % D2. But this time use only the data corresponding to the training set.
 
@@ -282,7 +281,6 @@ test_target = data.y(train_size+1:end);
 %and standard deviation from it for normalizing the test dataset.
 [meanColumns, stdevColumns, D2_train] = normalization(D2_train');
 D2_train = D2_train';
-
 %%
 % d) Train your model on the training set.
 w_in = zeros(1,size(D2_train,1)+1);
