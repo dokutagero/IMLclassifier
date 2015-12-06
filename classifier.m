@@ -36,7 +36,6 @@ for i=1:size(diabetes_db.x,1)
     attr = diabetes_db.x(i,:);
     nan_pos = isnan(diabetes_db.x(i,:));
     attr_no_nan = ~nan_pos;
-    %attr_mean(i) = mean(diabetes_db.x(nan_pos,i));
     D1(i,nan_pos) = mean(diabetes_db.x(i,attr_no_nan));
 end
 %%
@@ -180,6 +179,8 @@ t = 0.01;
 [ y_classified_test ] = linearClassifier(test_data,w_train);
 
 
+
+
 %%
 % e) Answer the following questions:   
 %   - Which is the error rate on your training data?
@@ -230,8 +231,13 @@ test_target = data.y(train_size+1:end);
 
 % c) Preprocess the data replacing the NaN using the method for creating
 % D2. But this time use only the data corresponding to the training set.
+
+%c1_means have values of the dataset that belong to class -1 while c2_means
+%has the value for class -1
 [D2_train,c1_means,c2_means] = preprocessData2(train_data,train_target);
 
+%In this case, beside normalizing the training dataset, we obtain the mean
+%and standard deviation from it for normalizing the test dataset.
 [meanColumns, stdevColumns, D2_train] = normalization(D2_train');
 D2_train = D2_train';
 
@@ -248,6 +254,9 @@ t = 0.01;
 % e) Replace the NaN values using the means computed on the training data
 D2_test = test_data;
 
+%Note that c1_means and c2_means was computed above and correspond to the
+%mean of the attributes taking into account the class each sample belongs
+%to.
 for i=1:size(test_data,1)
     attr = test_data(i,:);
     attr_no_nan = ~isnan(test_data(i,:));
@@ -258,6 +267,8 @@ for i=1:size(test_data,1)
     D2_test(i,c_nan == -1) = c2_means(i);
 end
 
+%Normalize the test dataset with the mean and standard deviation from the
+%training dataset.
 [meanColumns, stdevColumns, D2_test] = normalization(D2_test',meanColumns, stdevColumns);
 D2_test = D2_test';
 
@@ -271,6 +282,9 @@ train_err_rate = (train_errors/train_size) *100;
 [ y_classified_test ] = linearClassifier(D2_test,w_train);
 test_errors = sum(y_classified_test ~= test_target);
 test_err_rate = (test_errors/length(test_target)) *100;
+%%
+train_err_rate
+test_err_rate
 
 %   - Are they similar? Did you expect that behavior? Why?
 
@@ -290,8 +304,8 @@ times = 10;
 
 for i = 1:times-1
    block5;    
-   train_rate(i) = train_err_rate;
-   test_rate(i) = test_err_rate;
+   train_rate(i) = train_err_rate/100;
+   test_rate(i) = test_err_rate/100;
 end
 
 figure;
@@ -308,8 +322,8 @@ N = zeros(1,times-1);
 
 for i = 1:times-1
    block5_analitic;
-   train_rate(i) = train_err_rate;
-   test_rate(i) = test_err_rate;
+   train_rate(i) = train_err_rate/100;
+   test_rate(i) = test_err_rate/100;
 end
 
 figure;
@@ -326,19 +340,33 @@ upperBound = zeros(1,length(N));
 dVC = 9;
 delta = 0.01;
 for j=1:length(N);
-    upperBound(j) =  test_rate(j) + sqrt((dVC*(log(2*N(j)/dVC)+1) + log(2/delta))/(2*N(j)));
+    upperBound(j) =  train_rate(j) + sqrt((dVC*(log(2*N(j)/dVC)+1) + log(2/delta))/(2*N(j)));
 end
 hold on
 plot(upperBound,'g');
 
 %%
 % 3)
-syms n;
+syms n n2;
 delta = 0.05;
 error_deviation = 0.01;
-n = solve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == ...
+n = vpasolve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == ...
     error_deviation, n);
-eval(n);
+%n = solve(error_deviation == sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))), n);
+n2 = solve(error_deviation == sqrt((log((2*n2*exp(1) / dVC)^dVC * (2/delta)))/(2*n2)), n2) ;
+
+eval(n)
+eval(n2)
+
+% clear; clc;
+% delta = 0.05; % confidence 95%
+% deviationError = 0.01; % variance 1%
+% dVC = 9;
+% 
+% syms N;
+% sol1 = solve(sqrt( log( ((((2*N*exp(1))/dVC)^dVC) * (2/delta) ) - exp(2*N) )) == deviationError, N) ;
+% fprintf('Result 1: \n');
+% disp(sol1);
 %Some notes: slide 61/73 has the expression of VC. From the data given in
 %the last question, the % error deviation should be the difference between
 %the training and testing. On the other hand, the confidence is 1-delta. I
@@ -347,4 +375,3 @@ eval(n);
 %discussion with Marco, it seems that the question is not actually this
 %one. We are not sure exactly how to proceed.
 
-close all
