@@ -218,19 +218,17 @@ train_err_rate = (train_errors/train_size) *100;
 test_errors = sum(y_classified_test ~= test_target);
 test_err_rate = (test_errors/length(test_target)) *100;
 
-%   - Are they similar? Did you expect that behavior? Why?
-% Yes, they are similar
-%THIS EXPLANATION IS TEMPORAL JUST WRITING BASIC IDEA
-% Yes that behaviour was expected because we have replaced the Nan values
-% with the mean value of the attribute, for this the examples we reserve
-% for the test will be "similar" to those that we have used in the
-% training, achieving a good classification.
-% Maybe really similar samples in both train and testing???
-%%
-mean_test_data = mean(test_data, 2)
-mean_train_data = mean(train_data, 2)
+
 train_err_rate
 test_err_rate
+%%
+% The values obtained for the training error rate and test error rate are
+% available above. Both error rates are very similar, having only a
+% difference of around 1% error rate. This behaviour was expected since
+% when replacing the NaN values we are introducing the mean with values
+% from the training dataset taken into account. We are averaging the values
+% for a given attribute with both the values from the training and the
+% testing dataset, making them more similar.
 %%
 % |*Question block 5*|
 %%
