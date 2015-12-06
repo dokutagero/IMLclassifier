@@ -45,7 +45,7 @@ D2_test = D2_test';
 % f) Answer the following questions: 
 %   - Which is the error rate on your training data? 
 train_errors = sum(y_classified_train ~= train_target);
-train_err_rate = (train_errors/train_size) *100
+train_err_rate = (train_errors/train_size) *100;
 
 %   - Which is the error rate on your test data? 
 [ y_classified_test ] = linearClassifier(D2_test,w_train);

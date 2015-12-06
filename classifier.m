@@ -1,26 +1,34 @@
-%% EXERCISE 2: CLASSIFIER
+%% EXERCISE 2: OUR FIRST CLASSIFIER
 % * Submitted by: Abhishek Saurabh, Juanjo Rubio and Miguel M?ndez
 % * Program: Master's in Artificial Intelligence
 % * Course: Introduction to Machine Learning
-% * Due date: 29-Nov-2015
+% * Due date: 06-Dec-2015
 
-%% Data set analysis
+%% B. Data set analysis
+%%
 diabetes_db = load('diabetes.mat');
 %%
-% * Which is the cardinality of the train set?
-%
+% |*Question block 1:*|
+% |*1) Which is the cardinality of the train set?*|
+
+% Cardinality of the training dataset
 cardinality = size(diabetes_db.x,2)
 %%
-% * Which is the dimensionality of the train set?
-%
+% |*2) Which is the dimensionality of the train set?*|
+
+% Dimensionality of training dataset
 dimensionality = size(diabetes_db.x,1)
 %%
-% * Which is the mean value of the train set?
-%mean_diabetes = mean2(diabetes_db.x)
+% |*3) Which is the mean value of the train set?*|
+
+% Mean value of training dataset
 mean_diabetes_attr = mean(diabetes_db.x,2)
 %%
-% * 1) Create a new dataset D1, replacing the NaN values with the mean
-% value of the corresponding attribute without considering the missing values.
+% |*Question block 2:*|
+% |*1) Create a new dataset D1, replacing the NaN values with the mean
+% value of the corresponding attribute without considering the missing
+% values.*|
+
 D1 = diabetes_db.x;
 for i=1:size(diabetes_db.x,1)
     attr = diabetes_db.x(i,:);
@@ -30,25 +38,46 @@ for i=1:size(diabetes_db.x,1)
     D1(i,nan_pos) = mean(diabetes_db.x(i,attr_no_nan));
 end
 %%
-% * 2) Create a new dataset D2, replacing the NaN values with the mean 
-% value of the corresponding attribute without considering the missing 
-% values conditioned to the class they belong, i.e. replace the missing 
-% attribute values of class +1 with the mean of that attribute of the 
-% examples of class +1, and the same for the other class.
+% |*2) Create a new dataset D2, replacing the NaN values with the mean value
+% of the corresponding attribute without considering the missing values
+% conditioned to the class they belong, i.e. replace the missing attribute
+% values of class +1 with the mean of that attribute of the examples of
+% class +1, and the same for the other class.*|
 
 D2 = preprocessData2(diabetes_db.x,diabetes_db.y);
-
 %%
-% * 4) Which are the new mean values of each dataset?
-
-mean_d1 = mean(D1,2)
-mean_d2 = mean(D2,2)
-
-%% A simple classifier
-%
+% |*3) [Optional :] Explain another method to deal with missing values and
+% apply it to preprocess the training data. Include the reference of the
+% method used. Consider this new dataset as D3.*|
+ 
 %%
-% * 1) In this model you have to learn the threshold value. Explain how you
-% can accomodate this parameter.
+% |KNN Imputation: In this method similarity between two instances of data
+% is measured to impute the missing values. It is assumed that if two
+% instance of data is similar and one of them has a missing value in some
+% variable, then the probability that this value is similar to the value of
+% some other observation is high.| 
+%%
+% |*Reference:* Batista, Gustavo EAPA, and Maria Carolina Monard. "A Study of
+% K-Nearest Neighbour as an Imputation Method." HIS 87.251-260 (2002): 48.|
+%%
+% |knnimpute() function in matlab implements this method. This function
+% replaces NaNs in the data with a weighted mean of k nearest neighbours
+% (=5 in this case). Weights are inversely proportional to the distance
+% from the neighbouring columns.|
+D3 = knnimpute(diabetes_db.x', 5)';
+%%
+% |*4) Which are the new mean values of each dataset?*|
+
+mean_d1 = mean(D1,2);
+mean_d2 = mean(D2,2);
+mean_d3 = mean(D3,2);
+
+%% C. A Simple Classifier
+%%
+% |*Question block 3:*|
+% |*1) In this model you have to learn the threshold value. Explain how you
+% can accomodate this parameter.*|
+
 %Set the initial parameters
 [meanColumns, stdevColumns, D1_norm] = normalization(D1');
 D1_norm = D1_norm';
@@ -59,32 +88,40 @@ w_in = zeros(1,size(D1,1)+1)*10;
 maxIter = 10000;
 minError = 1e-5;
 t = 0.01;
-[ w_D1, costFunction_D1 ] = gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
+[ w_D1, costFunction_D1 ] = ...
+    gradient_descent( D1_norm, diabetes_db.y, maxIter, minError,w_in,t );
 [ y_classified_D1 ] = linearClassifier(D1,w_D1);
 %%
-% Number of elements corretly classified with D1:
-D1_correct_class = sum(y_classified_D1 == diabetes_db.y)
-correct_rate = (D1_correct_class/length(diabetes_db.y))*100
-
+% |*3) Compute the error rates achieved on the training data. Are there
+% significant differences? Report the method used and their parameters.*|
 %%
-[ w_D2, costFunction_D2 ] = gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
+% Number of elements corretly classified with D1:
+D1_correct_class = sum(y_classified_D1 == diabetes_db.y);
+correct_rate_D1 = (D1_correct_class/length(diabetes_db.y))*100;
+
+%
+[ w_D2, costFunction_D2 ] = ...
+    gradient_descent( D2_norm, diabetes_db.y, maxIter, minError, w_in, t);
 [ y_classified_D2 ] = linearClassifier(D2_norm,w_D2);
 
-%%
+%
 % Number of elements corretly classified with D2:
-D2_correct_class = sum(y_classified_D2 == diabetes_db.y)
-correct_rate = (D2_correct_class/length(diabetes_db.y))*100
-
-%% Normal Vectors
+D2_correct_class = sum(y_classified_D2 == diabetes_db.y);
+correct_rate_D2 = (D2_correct_class/length(diabetes_db.y))*100;
+%%
+% |*2) Report the normal vector of the separating hyperplane for each
+% data set D1, D2, D3.*|
+%%
 %Normal vector of the hyperplane for Dataset1
 w_D1
 %Normal vector of the hyperplane for Dataset1
 w_D2
-
-%% 
-% * 1) Repeat the learning process in block 3 using just D2 but holding-out the last
-%fifth of the data set for testing purposes, i.e. use the first 4/5-th for train and
-%the last 1/5-th for testing.
+%%
+% |*Question block 4*|
+%%
+% |*1) Repeat the learning process in block 3 using just D2 but holding-out
+% the last fifth of the data set for testing purposes, i.e. use the first
+% 4/5-th for train and the last 1/5-th for testing.*|
 
 %%
 % a) Clear workspace
@@ -122,11 +159,11 @@ t = 0.01;
 % e) Answer the following questions:   
 %   - Which is the error rate on your training data?
 train_errors = sum(y_classified_train ~= train_target);
-train_err_rate = (train_errors/train_size) *100
+train_err_rate = (train_errors/train_size) *100;
 
 %   - Which is the error rate on your test data?
 test_errors = sum(y_classified_test ~= test_target);
-test_err_rate = (test_errors/length(test_target)) *100
+test_err_rate = (test_errors/length(test_target)) *100;
 
 %   - Are they similar? Did you expect that behavior? Why?
 % Yes, they are similar
@@ -136,10 +173,12 @@ test_err_rate = (test_errors/length(test_target)) *100
 % for the test will be "similar" to those that we have used in the
 % training, achieving a good classification
 
+%%
+% |*Question block 5*|
+%%
 
-%% 
-%  * 1) Repeat the process in block 4 changing the order of some of the
-% steps. Follow exactly the following steps in your process:
+% |*1) Repeat the process in block 4 changing the order of some of the
+% steps. Follow exactly the following steps in your process:*|
 
 %% 
 % a) Clear workspace
@@ -195,12 +234,12 @@ D2_test = D2_test';
 % f) Answer the following questions: 
 %   - Which is the error rate on your training data? 
 train_errors = sum(y_classified_train ~= train_target);
-train_err_rate = (train_errors/train_size) *100
+train_err_rate = (train_errors/train_size) *100;
 
 %   - Which is the error rate on your test data? 
 [ y_classified_test ] = linearClassifier(D2_test,w_train);
 test_errors = sum(y_classified_test ~= test_target);
-test_err_rate = (test_errors/length(test_target)) *100
+test_err_rate = (test_errors/length(test_target)) *100;
 
 %   - Are they similar? Did you expect that behavior? Why?
 
@@ -208,16 +247,18 @@ test_err_rate = (test_errors/length(test_target)) *100
 % g) Compare these results with the ones in block 4. Do we achieve
 %   better or worse results? Why?
 %BETTER RESULTS
+%%
+% |*Question block 6*|
+%%
 
-%% 
-% * 1) Repeat the process in block 5 changing the percentage of the data for training
-% and testing. Plot a graph with the training and test error rates for each
-% splitting percentage point. Comment the results.
+% |*1) Repeat the process in block 5 changing the percentage of the data for
+% training and testing. Plot a graph with the training and test error rates
+% for each splitting percentage point. Comment the results.*|
 clear all
 times = 10;
 
 for i = 1:times-1
-   block5    
+   block5;    
    train_rate(i) = train_err_rate;
    test_rate(i) = test_err_rate;
 end
@@ -226,7 +267,7 @@ figure;
 plot((1:times-1),train_rate);
 hold on;
 plot((1:times-1),test_rate,'r');
-legend('Train error rate','Test error rate')
+legend('Train error rate','Test error rate');
 
 %% Testing analytical solution
 clear all;
@@ -235,7 +276,7 @@ times=10;
 N = zeros(1,times-1);
 
 for i = 1:times-1
-   block5_analitic
+   block5_analitic;
    train_rate(i) = train_err_rate;
    test_rate(i) = test_err_rate;
 end
@@ -257,15 +298,16 @@ for j=1:length(N);
     upperBound(j) =  test_rate(j) + sqrt((dVC*(log(2*N(j)/dVC)+1) + log(2/delta))/(2*N(j)));
 end
 hold on
-plot(upperBound,'g')
+plot(upperBound,'g');
 
 %%
 % 3)
-syms n
-delta = 0.05
+syms n;
+delta = 0.05;
 error_deviation = 0.01;
-n = solve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == error_deviation, n);
-eval(n)
+n = solve(sqrt((dVC*(log(2*n/dVC)+1) + log(2/delta)/(2*n))) == ...
+    error_deviation, n);
+eval(n);
 %Some notes: slide 61/73 has the expression of VC. From the data given in
 %the last question, the % error deviation should be the difference between
 %the training and testing. On the other hand, the confidence is 1-delta. I
